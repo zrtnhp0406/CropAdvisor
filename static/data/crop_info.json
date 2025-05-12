@@ -527,6 +527,130 @@
     "marketValue": "Mango prices typically range from $800-2000 per ton depending on variety, quality, and market conditions."
   },
   {
+    "name": "apple",
+    "description": "Apple (Malus domestica) is one of the most widely cultivated and consumed fruits globally. Originating from Central Asia, apples have been grown for thousands of years in Asia and Europe. They are renowned for their crisp texture, sweet to tart flavor, and significant nutritional value.",
+    "nutrients": {
+      "fats": 0.2,
+      "proteins": 0.3,
+      "carbs": 13.4
+    },
+    "growingConditions": {
+      "temperature": "20-25°C",
+      "humidity": "50-80%",
+      "ph": "6.0-7.0",
+      "rainfall": "1000-1300mm"
+    },
+    "soilRequirements": "Apples thrive in well-drained, deep loamy soils rich in organic matter. The optimal soil pH ranges from 6.0 to 7.0. Soils should have good aeration and fertility, avoiding waterlogging conditions.",
+    "npkRequirements": {
+      "n": 50,
+      "p": 8.5,
+      "k": 90
+    },
+    "growingSeason": "Apple trees require a chilling period of approximately 1000 hours below 7°C to break dormancy. Flowering occurs in early spring, with fruit maturing in late summer to autumn. Trees typically begin bearing fruit after 3-5 years.",
+    "yield": "A mature apple tree can yield between 100 to 300 kg of fruit annually, depending on the variety and cultivation practices.",
+    "uses": [
+      "Fresh fruit consumption",
+      "Juices and ciders",
+      "Baking and cooking",
+      "Dried fruit",
+      "Vinegar and preserves"
+    ],
+    "marketValue": "Apple prices vary based on variety, quality, and market conditions, typically ranging from $600 to $1500 per ton."
+  },
+  {
+    "name": "orange",
+    "description": "Orange (*Citrus sinensis*) is a globally cultivated citrus fruit, renowned for its sweet flavor and high vitamin C content. Originating from Southeast Asia, it is now widely grown in tropical and subtropical regions, playing a significant role in global agriculture.",
+    "nutrients": {
+      "fats": 0.1,
+      "proteins": 0.9,
+      "carbs": 12.0
+    },
+    "growingConditions": {
+      "temperature": "15–30°C",
+      "humidity": "50–80%",
+      "ph": "6.0–7.5",
+      "rainfall": "1000–1500mm"
+    },
+    "soilRequirements": "Oranges thrive in well-drained, deep loamy soils with a pH between 6.0 and 7.5. Sandy loam or loamy soils are ideal. Proper drainage is essential to prevent root diseases.",
+    "npkRequirements": {
+      "n": 60,
+      "p": 40,
+      "k": 80
+    },
+    "growingSeason": "Orange trees are typically planted in spring or early summer. They begin bearing fruit 3–5 years after planting, with harvesting occurring in late autumn to winter, depending on the variety and region.",
+    "yield": "A mature orange tree can yield approximately 200–400 fruits per season. With optimal care, yields can reach up to 600 fruits per tree annually.",
+    "uses": [
+      "Fresh fruit consumption",
+      "Juices and concentrates",
+      "Marmalades and preserves",
+      "Essential oils",
+      "Culinary applications"
+    ],
+    "marketValue": "Orange prices vary based on variety, quality, and market conditions, typically ranging from $500 to $1500 per ton."
+  },
+    {
+    "name": "papaya",
+    "description": "Papaya (*Carica papaya*) is a fast-growing tropical fruit tree native to Central America, now widely cultivated in tropical and subtropical regions worldwide. Known for its sweet, orange-fleshed fruit rich in vitamins A and C, papaya is valued for both its nutritional and medicinal properties.",
+    "nutrients": {
+      "fats": 0.3,
+      "proteins": 0.5,
+      "carbs": 11.0
+    },
+    "growingConditions": {
+      "temperature": "21–33°C",
+      "humidity": "60–85%",
+      "ph": "6.0–6.5",
+      "rainfall": "1000–1500mm"
+    },
+    "soilRequirements": "Papaya thrives in well-drained, sandy loam soils rich in organic matter. The optimal soil pH ranges from 6.0 to 6.5. Waterlogging and salinity should be avoided, as papaya is sensitive to both conditions.",
+    "npkRequirements": {
+      "n": 200,
+      "p": 200,
+      "k": 400
+    },
+    "growingSeason": "Papaya can be cultivated year-round in tropical climates. The plants typically begin bearing fruit 6 to 10 months after planting, with peak production occurring in the second year. The economic lifespan of a papaya plantation is about 3 to 4 years.",
+    "yield": "A mature papaya tree can produce between 30 to 150 fruits annually, depending on the variety and cultivation practices. This equates to approximately 35 to 50 tons per hectare per year.",
+    "uses": [
+      "Fresh fruit consumption",
+      "Juices and smoothies",
+      "Jams and preserves",
+      "Papain enzyme extraction",
+      "Culinary ingredient in salads and desserts"
+    ],
+    "marketValue": "Papaya prices vary based on region, quality, and market demand, typically ranging from $300 to $800 per ton."
+  },
+    {
+    "name": "coconut",
+    "description": "Coconut (*Cocos nucifera*) is a tropical palm tree cultivated extensively in coastal and humid regions worldwide. Renowned for its versatility, the coconut provides food, oil, fiber, and timber. It thrives in sandy soils and is integral to the economies of many tropical countries.",
+    "nutrients": {
+      "fats": 33.5,
+      "proteins": 3.3,
+      "carbs": 15.2
+    },
+    "growingConditions": {
+      "temperature": "27–32°C",
+      "humidity": "70–80%",
+      "ph": "5.2–8.6",
+      "rainfall": "1200–2500mm"
+    },
+    "soilRequirements": "Coconut palms prefer well-drained sandy loam soils with good water-holding capacity. They tolerate a wide pH range (5.2–8.6) and can grow in coastal alluviums and river valleys. Proper drainage is essential to prevent root diseases.",
+    "npkRequirements": {
+      "n": 1000,
+      "p": 500,
+      "k": 2000
+    },
+    "growingSeason": "Coconuts can be planted year-round in tropical climates, with the onset of the rainy season being ideal. Trees begin bearing fruit 6–7 years after planting, with peak production occurring between 15–20 years.",
+    "yield": "A mature coconut tree typically yields 50–80 nuts per year. Under optimal conditions, yields can reach up to 100–150 nuts annually. Plantations with 150 trees per hectare can produce approximately 9,000 coconuts per year.",
+    "uses": [
+      "Fresh consumption",
+      "Coconut water and milk",
+      "Coconut oil production",
+      "Coir fiber extraction",
+      "Timber and construction materials"
+    ],
+    "marketValue": "Coconut prices vary based on product type and region, typically ranging from $300 to $800 per ton for raw nuts."
+  },
+  {
     "name": "cotton",
     "description": "Cotton is a soft, fluffy staple fiber that grows in a boll around the seeds of cotton plants of the genus Gossypium. It is a major cash crop and one of the most important textile fibers in the world.",
     "nutrients": {
