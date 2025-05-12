@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import logging
 from sklearn.model_selection import train_test_split
-from crop_predictor import create_models
+from models.crop_predictor import create_models
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)

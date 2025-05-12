@@ -194,6 +194,16 @@
         {% if prediction %}
         // Fetch crop information
         fetchCropInfo('{{ prediction }}');
+        
+        {% if model_predictions %}
+        // Create model predictions comparison chart
+        const modelPredictions = {
+            {% for model_name, model_prediction in model_predictions.items() %}
+            "{{ model_name }}": "{{ model_prediction }}",
+            {% endfor %}
+        };
+        createModelComparisonChart('modelPredictionsChart', modelPredictions, '{{ prediction }}');
+        {% endif %}
         {% endif %}
     });
     
