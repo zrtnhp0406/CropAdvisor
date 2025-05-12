@@ -8,7 +8,7 @@ import pickle
 from model import MultiClassSVM, MultiClassLogisticRegression, KNN, DecisionTreeClassifierFromScratch, RandomForestClassifierFromScratch
 
 # Load dataset
-df = pd.read_csv('Crop_recommendation.csv')
+df = pd.read_csv(r'C:\Users\ADMIN\Downloads\CropAdvisor (4)\CropAdvisor\data\crop_recommendation.csv')
 label_encoder = LabelEncoder()
 df['crop'] = label_encoder.fit_transform(df['label'])
 
@@ -24,10 +24,10 @@ X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, 
 
 # List of models to train
 models = {
-    #'svm_scratch_model.pkl': MultiClassSVM(),
-    # 'knn_scratch_model.pkl': KNN(k=3),  # Ensure k is specified
-    # 'dt_scratch_model.pkl': DecisionTreeClassifierFromScratch(is_continuous_list=[True, True, True, True, True, True, True]),
-    # 'rf_scratch_model.pkl': RandomForestClassifierFromScratch(n_trees=20, max_features=3, is_continuous_list=[True, True, True, True, True, True, True]),  # Use n_trees instead of n_estimators
+    'svm_scratch_model.pkl': MultiClassSVM(),
+    'knn_scratch_model.pkl': KNN(k=3),  # Ensure k is specified
+    'dt_scratch_model.pkl': DecisionTreeClassifierFromScratch(is_continuous_list=[True, True, True, True, True, True, True]),
+    'rf_scratch_model.pkl': RandomForestClassifierFromScratch(n_trees=20, max_features=3, is_continuous_list=[True, True, True, True, True, True, True]),  # Use n_trees instead of n_estimators
     'logistic_scratch_model.pkl': MultiClassLogisticRegression()
 }
 

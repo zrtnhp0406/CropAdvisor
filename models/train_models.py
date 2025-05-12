@@ -65,7 +65,7 @@ def train_and_save_models(data_path):
 
 if __name__ == "__main__":
     # Example usage - replace with actual data path
-    data_path = "../data/crop_recommendation.csv"
+    data_path = "CropAdvisor/data/crop_recommendation.csv"
     
     if os.path.exists(data_path):
         accuracy_scores = train_and_save_models(data_path)
