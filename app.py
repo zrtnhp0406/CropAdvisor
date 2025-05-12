@@ -12,20 +12,6 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "default-secret-key-for-development")
 
-# Load the pre-trained model
-model_path = os.path.join(os.path.dirname(__file__), 'models/crop_recommendation_model.pkl')
-try:
-    if os.path.exists(model_path):
-        with open(model_path, 'rb') as f:
-            model = pickle.load(f)
-        logging.info("Model loaded successfully")
-    else:
-        model = None
-        logging.warning(f"Model file not found at {model_path}. Place your pre-trained model here.")
-except Exception as e:
-    model = None
-    logging.error(f"Error loading model: {str(e)}")
-
 # Routes
 @app.route('/')
 def index():
@@ -58,28 +44,11 @@ def predict():
                 'rainfall': rainfall
             }
             
-            # Make prediction using the ensemble
+            # Make prediction using the enhanced ensemble prediction
             prediction_result = predict_crop(n, p, k, temperature, humidity, ph, rainfall)
             
-            # Get individual model predictions if available
-            model_dir = os.path.join(os.path.dirname(__file__), 'models')
-            model_predictions = {}
-            model_names = ['KNN', 'Random Forest', 'SVM', 'Logistic Regression', 'Decision Tree']
-            file_names = ['knn_model.pkl', 'random_forest_model.pkl', 'svm_model.pkl', 
-                          'logistic_regression_model.pkl', 'decision_tree_model.pkl']
-            
-            input_data = np.array([[n, p, k, temperature, humidity, ph, rainfall]])
-            
-            for idx, file_name in enumerate(file_names):
-                model_path = os.path.join(model_dir, file_name)
-                if os.path.exists(model_path):
-                    try:
-                        with open(model_path, 'rb') as f:
-                            model_instance = pickle.load(f)
-                        pred = model_instance.predict(input_data)[0]
-                        model_predictions[model_names[idx]] = pred
-                    except Exception as model_err:
-                        logging.error(f"Error with model {file_name}: {str(model_err)}")
+            # Model predictions will be filled in automatically by the predict_crop function
+            # We don't need to manually load models here anymore
             
             flash(f'Recommended crop: {prediction_result}', 'success')
                 

@@ -61,43 +61,139 @@ def predict_crop(n, p, k, temperature, humidity, ph, rainfall):
     - String containing the recommended crop
     """
     try:
-        # Try to load pre-trained models
-        model_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models')
+        # Define directories to search for model files
+        model_dirs = [
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models', 'pkl_files'),  # models/pkl_files
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models'),  # models directory
+            os.path.dirname(os.path.dirname(__file__)),  # root directory
+        ]
+        
         input_data = np.array([[n, p, k, temperature, humidity, ph, rainfall]])
         
-        # Check if we have pre-trained models
-        models_exist = all(os.path.exists(os.path.join(model_dir, f"{model_name}_model.pkl")) 
-                           for model_name in ['knn', 'random_forest', 'svm', 'logistic_regression', 'decision_tree'])
+        # Define all possible model file names
+        model_file_patterns = [
+            # Original naming pattern
+            {'knn': 'knn_model.pkl', 
+             'random_forest': 'random_forest_model.pkl', 
+             'svm': 'svm_model.pkl', 
+             'logistic_regression': 'logistic_regression_model.pkl', 
+             'decision_tree': 'decision_tree_model.pkl'},
+            
+            # Alternative naming pattern (from train.py)
+            {'knn': 'knn_scratch_model.pkl', 
+             'random_forest': 'rf_scratch_model.pkl', 
+             'svm': 'svm_scratch_model.pkl', 
+             'logistic_regression': 'logistic_scratch_model.pkl', 
+             'decision_tree': 'dt_scratch_model.pkl'},
+            
+            # Generic numbered pattern
+            {'knn': 'model_1.pkl', 
+             'random_forest': 'model_2.pkl', 
+             'svm': 'model_3.pkl', 
+             'logistic_regression': 'model_4.pkl', 
+             'decision_tree': 'model_5.pkl'}
+        ]
         
-        if models_exist:
+        # Search for models using all patterns in all directories
+        models_found = False
+        model_paths = {}
+        
+        for directory in model_dirs:
+            if models_found:
+                break
+                
+            for pattern in model_file_patterns:
+                # Check if all model files for this pattern exist in this directory
+                if all(os.path.exists(os.path.join(directory, filename)) for filename in pattern.values()):
+                    # Found all models in this directory with this pattern
+                    for model_name, filename in pattern.items():
+                        model_paths[model_name] = os.path.join(directory, filename)
+                    models_found = True
+                    logging.info(f"Found all model files in {directory} using pattern {pattern}")
+                    break
+        
+        if models_found:
             # Load all models and make predictions
             predictions = []
-            for model_name in ['knn', 'random_forest', 'svm', 'logistic_regression', 'decision_tree']:
-                model_path = os.path.join(model_dir, f"{model_name}_model.pkl")
-                with open(model_path, 'rb') as f:
-                    model = pickle.load(f)
+            model_predictions = {}
+            
+            for model_name, model_path in model_paths.items():
+                try:
+                    with open(model_path, 'rb') as f:
+                        model_data = pickle.load(f)
+                    
+                    # Handle both raw model and dictionary formats
+                    if isinstance(model_data, dict) and 'model' in model_data:
+                        # Format: {'model': model_instance, 'scaler': scaler, ...}
+                        model = model_data['model']
+                        
+                        # If there's a scaler, use it
+                        if 'scaler' in model_data:
+                            input_scaled = model_data['scaler'].transform(input_data)
+                        else:
+                            input_scaled = input_data
+                            
+                        # Make prediction
+                        if hasattr(model, 'predict_classes'):
+                            pred = model.predict_classes(input_scaled)[0]
+                        elif hasattr(model, 'predict_batch'):
+                            pred = model.predict_batch(input_scaled)[0]
+                        else:
+                            pred = model.predict(input_scaled)[0]
+                            
+                        # Decode prediction if needed
+                        if 'label_encoder' in model_data and hasattr(model_data['label_encoder'], 'inverse_transform'):
+                            pred = model_data['label_encoder'].inverse_transform([pred])[0]
+                            
+                    else:
+                        # Format: direct model instance
+                        model = model_data
+                        pred = model.predict(input_data)[0]
+                    
+                    predictions.append(pred)
+                    model_predictions[model_name] = pred
+                    logging.info(f"{model_name.upper()} prediction: {pred}")
+                    
+                except Exception as e:
+                    logging.error(f"Error with model {model_name}: {str(e)}")
+                    
+            if predictions:
+                # Get the most common prediction (voting)
+                prediction_counts = Counter(predictions)
+                most_common_prediction = prediction_counts.most_common(1)[0][0]
                 
-                pred = model.predict(input_data)[0]
-                predictions.append(pred)
-                logging.info(f"{model_name.upper()} prediction: {pred}")
-            
-            # Get the most common prediction (voting)
-            prediction_counts = Counter(predictions)
-            most_common_prediction = prediction_counts.most_common(1)[0][0]
-            
-            logging.info(f"Final ensemble prediction: {most_common_prediction}")
-            return most_common_prediction
+                logging.info(f"Final ensemble prediction: {most_common_prediction}")
+                return most_common_prediction
         
         # Try to load single pre-trained model as fallback
-        model_path = os.path.join(model_dir, 'crop_recommendation_model.pkl')
-        if os.path.exists(model_path):
-            with open(model_path, 'rb') as f:
-                model = pickle.load(f)
-            
-            # Use the model for prediction
-            prediction = model.predict(input_data)[0]
-            logging.info(f"Using single model prediction: {prediction}")
-            return prediction
+        for directory in model_dirs:
+            model_path = os.path.join(directory, 'crop_recommendation_model.pkl')
+            if os.path.exists(model_path):
+                with open(model_path, 'rb') as f:
+                    model_data = pickle.load(f)
+                
+                # Handle both raw model and dictionary formats
+                if isinstance(model_data, dict) and 'model' in model_data:
+                    model = model_data['model']
+                    
+                    # If there's a scaler, use it
+                    if 'scaler' in model_data:
+                        input_scaled = model_data['scaler'].transform(input_data)
+                    else:
+                        input_scaled = input_data
+                        
+                    # Make prediction
+                    prediction = model.predict(input_scaled)[0]
+                    
+                    # Decode prediction if needed
+                    if 'label_encoder' in model_data and hasattr(model_data['label_encoder'], 'inverse_transform'):
+                        prediction = model_data['label_encoder'].inverse_transform([prediction])[0]
+                else:
+                    model = model_data
+                    prediction = model.predict(input_data)[0]
+                
+                logging.info(f"Using single model prediction: {prediction}")
+                return prediction
         
         # If models not found, use basic rule-based system
         logging.warning("Using fallback prediction rules")
