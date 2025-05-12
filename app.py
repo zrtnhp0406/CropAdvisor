@@ -45,10 +45,16 @@ def predict():
             }
             
             # Make prediction using the enhanced ensemble prediction
-            prediction_result = predict_crop(n, p, k, temperature, humidity, ph, rainfall)
+            # Now returns both prediction and model predictions
+            prediction_result, model_predictions = predict_crop(n, p, k, temperature, humidity, ph, rainfall)
             
-            # Model predictions will be filled in automatically by the predict_crop function
-            # We don't need to manually load models here anymore
+            # Calculate vote counts for visualization
+            vote_counts = {}
+            for model_name, prediction in model_predictions.items():
+                if prediction in vote_counts:
+                    vote_counts[prediction] += 1
+                else:
+                    vote_counts[prediction] = 1
             
             flash(f'Recommended crop: {prediction_result}', 'success')
                 
@@ -56,8 +62,10 @@ def predict():
             logging.error(f"Prediction error: {str(e)}")
             flash(f'Error making prediction: {str(e)}', 'danger')
     
-    return render_template('predict.html', prediction=prediction_result, 
+    return render_template('predict.html', 
+                          prediction=prediction_result, 
                           model_predictions=model_predictions,
+                          vote_counts=vote_counts if 'vote_counts' in locals() else None,
                           input_data=session.get('input_data', None))
 
 @app.route('/crops')

@@ -163,7 +163,8 @@ def predict_crop(n, p, k, temperature, humidity, ph, rainfall):
                 most_common_prediction = prediction_counts.most_common(1)[0][0]
                 
                 logging.info(f"Final ensemble prediction: {most_common_prediction}")
-                return most_common_prediction
+                # Return both the final prediction and individual model predictions
+                return most_common_prediction, model_predictions
         
         # Try to load single pre-trained model as fallback
         for directory in model_dirs:
@@ -193,35 +194,42 @@ def predict_crop(n, p, k, temperature, humidity, ph, rainfall):
                     prediction = model.predict(input_data)[0]
                 
                 logging.info(f"Using single model prediction: {prediction}")
-                return prediction
+                # Return prediction and a simple model_predictions dictionary with just this model
+                model_name = os.path.basename(model_path).split('.')[0]
+                return prediction, {model_name: prediction}
         
         # If models not found, use basic rule-based system
         logging.warning("Using fallback prediction rules")
         
-        # Simple rule-based system (this is simplified and not as accurate as a trained model)
-        # These rules are just examples and should be replaced with actual agricultural knowledge
+        # Create a simple rule-based system with explanations
+        rule_predictions = {}
+        
+        # Rules for different pH ranges
         if ph < 5.5:
-            if rainfall > 200 and temperature > 25:
-                return "rice"
-            else:
-                return "blueberry"
+            rule_predictions["Low pH Rule"] = "rice" if rainfall > 200 and temperature > 25 else "blueberry"
         elif ph < 6.5:
-            if k > 40 and rainfall < 100:
-                return "maize"
-            else:
-                return "wheat"
+            rule_predictions["Mid-Low pH Rule"] = "maize" if k > 40 and rainfall < 100 else "wheat"
         elif ph < 7.5:
-            if n > 40 and p > 40:
-                return "cotton"
-            else:
-                return "sunflower"
+            rule_predictions["Mid-High pH Rule"] = "cotton" if n > 40 and p > 40 else "sunflower"
         else:  # pH >= 7.5
-            if rainfall > 200:
-                return "sugarcane"
-            else:
-                return "chickpea"
+            rule_predictions["High pH Rule"] = "sugarcane" if rainfall > 200 else "chickpea"
+            
+        # Additional rules based on other parameters
+        if temperature > 25 and humidity > 80:
+            rule_predictions["Hot & Humid Rule"] = "rice"
+        if n > 80 and p > 50 and k > 40:
+            rule_predictions["High NPK Rule"] = "banana"
+        if rainfall < 100 and temperature > 20:
+            rule_predictions["Dry & Warm Rule"] = "chickpea"
+            
+        # Get the most common prediction from our rules
+        rule_values = list(rule_predictions.values())
+        final_prediction = max(set(rule_values), key=rule_values.count)
+        
+        # Return both the prediction and the reasoning
+        return final_prediction, rule_predictions
                 
     except Exception as e:
         logging.error(f"Error in prediction: {str(e)}")
-        # If all else fails, return a general recommendation
-        return "Unable to make prediction. Please check your input values."
+        # If all else fails, return a general recommendation and an error indicator
+        return "Unable to make prediction. Please check your input values.", {"Error": "Model loading failed"}

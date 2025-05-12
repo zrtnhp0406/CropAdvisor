@@ -97,34 +97,52 @@
                         
                         {% if model_predictions %}
                         <div class="model-predictions mt-4">
-                            <h5>Individual Model Predictions:</h5>
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Model</th>
-                                            <th>Prediction</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for model_name, model_prediction in model_predictions.items() %}
-                                        <tr {% if model_prediction == prediction %}class="table-success"{% endif %}>
-                                            <td>{{ model_name }}</td>
-                                            <td>{{ model_prediction }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+                            <h5>Đặc trưng dự đoán từ các mô hình:</h5>
+                            
+                            <div class="row mt-4 mb-4">
+                                <div class="col-md-6">
+                                    <div class="prediction-chart-container">
+                                        <canvas id="voteDistributionChart" width="300" height="300"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Mô hình</th>
+                                                    <th>Dự đoán</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for model_name, model_prediction in model_predictions.items() %}
+                                                <tr {% if model_prediction == prediction %}class="table-success"{% endif %}>
+                                                    <td><strong>{{ model_name }}</strong></td>
+                                                    <td>
+                                                        {% if model_prediction == prediction %}
+                                                            <span class="badge bg-success">{{ model_prediction }}</span>
+                                                        {% else %}
+                                                            <span class="badge bg-secondary">{{ model_prediction }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="models-chart-container mt-3 mb-3">
-                                <canvas id="modelPredictionsChart" width="400" height="200"></canvas>
+                                <canvas id="modelPredictionsChart" width="600" height="250"></canvas>
                             </div>
                             
-                            <p class="text-muted small">
-                                <i class="fas fa-info-circle"></i> 
-                                Final recommendation is based on the most frequent prediction among all models (voting ensemble).
-                            </p>
+                            <div class="alert alert-info">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Cách dự đoán:</strong> Hệ thống sử dụng <strong>5 mô hình machine learning</strong> khác nhau
+                                để dự đoán cây trồng phù hợp nhất. Kết quả cuối cùng là <strong>cây trồng được nhiều mô hình
+                                bình chọn nhất</strong> (voting ensemble).
+                            </div>
                         </div>
                         {% endif %}
                         
@@ -202,6 +220,20 @@
             "{{ model_name }}": "{{ model_prediction }}",
             {% endfor %}
         };
+        
+        // Create vote counts for visualization
+        {% if vote_counts %}
+        const voteCounts = {
+            {% for crop, count in vote_counts.items() %}
+            "{{ crop }}": {{ count }},
+            {% endfor %}
+        };
+        
+        // Create detailed vote distribution chart
+        createDetailedModelComparisonChart('voteDistributionChart', modelPredictions, voteCounts, '{{ prediction }}');
+        {% endif %}
+        
+        // Create model comparison chart
         createModelComparisonChart('modelPredictionsChart', modelPredictions, '{{ prediction }}');
         {% endif %}
         {% endif %}
