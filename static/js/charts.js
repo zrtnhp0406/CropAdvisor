@@ -224,6 +224,85 @@ function createCropComparisonChart(canvasId, scores) {
 }
 
 /**
+ * Creates a bar chart for comparing model predictions
+ * @param {string} canvasId - The ID of the canvas element
+ * @param {object} modelPredictions - Object with model names and predictions
+ * @param {string} finalPrediction - The final prediction based on majority voting
+ */
+function createModelComparisonChart(canvasId, modelPredictions, finalPrediction) {
+    const canvas = document.getElementById(canvasId);
+    
+    if (!canvas) {
+        console.error(`Canvas element with ID "${canvasId}" not found.`);
+        return;
+    }
+    
+    // Transform predictions into a format for visualization
+    // Count occurrences of each prediction
+    const predictionCounts = {};
+    Object.values(modelPredictions).forEach(prediction => {
+        predictionCounts[prediction] = (predictionCounts[prediction] || 0) + 1;
+    });
+    
+    const uniquePredictions = Object.keys(predictionCounts);
+    const counts = Object.values(predictionCounts);
+    
+    // Create colors array with primary color for final prediction
+    const colors = uniquePredictions.map(prediction => 
+        prediction === finalPrediction ? 'rgba(76, 175, 80, 0.8)' : 'rgba(153, 153, 153, 0.4)');
+    
+    const ctx = canvas.getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: uniquePredictions,
+            datasets: [{
+                label: 'Number of Models',
+                data: counts,
+                backgroundColor: colors,
+                borderColor: colors.map(color => color.replace('0.4', '1').replace('0.8', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Model Predictions Distribution'
+                },
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const count = context.raw;
+                            return count === 1 ? `${count} model` : `${count} models`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: Object.keys(modelPredictions).length,
+                    title: {
+                        display: true,
+                        text: 'Number of Models'
+                    },
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+    
+    return chart;
+}
+
+/**
  * Creates a gauge chart to visualize a value within a range
  * @param {string} canvasId - The ID of the canvas element
  * @param {number} value - The value to display

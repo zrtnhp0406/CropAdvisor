@@ -34,6 +34,7 @@ def index():
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
     prediction_result = None
+    model_predictions = None
     
     if request.method == 'POST':
         try:
@@ -57,22 +58,38 @@ def predict():
                 'rainfall': rainfall
             }
             
-            # Make prediction
-            if model is not None:
-                input_data = np.array([[n, p, k, temperature, humidity, ph, rainfall]])
-                prediction = model.predict(input_data)[0]
-                prediction_result = prediction
-                flash(f'Recommended crop: {prediction}', 'success')
-            else:
-                # If model not loaded, use the helper function which can implement fallback logic
-                prediction_result = predict_crop(n, p, k, temperature, humidity, ph, rainfall)
-                flash(f'Recommended crop: {prediction_result}', 'success')
+            # Make prediction using the ensemble
+            prediction_result = predict_crop(n, p, k, temperature, humidity, ph, rainfall)
+            
+            # Get individual model predictions if available
+            model_dir = os.path.join(os.path.dirname(__file__), 'models')
+            model_predictions = {}
+            model_names = ['KNN', 'Random Forest', 'SVM', 'Logistic Regression', 'Decision Tree']
+            file_names = ['knn_model.pkl', 'random_forest_model.pkl', 'svm_model.pkl', 
+                          'logistic_regression_model.pkl', 'decision_tree_model.pkl']
+            
+            input_data = np.array([[n, p, k, temperature, humidity, ph, rainfall]])
+            
+            for idx, file_name in enumerate(file_names):
+                model_path = os.path.join(model_dir, file_name)
+                if os.path.exists(model_path):
+                    try:
+                        with open(model_path, 'rb') as f:
+                            model_instance = pickle.load(f)
+                        pred = model_instance.predict(input_data)[0]
+                        model_predictions[model_names[idx]] = pred
+                    except Exception as model_err:
+                        logging.error(f"Error with model {file_name}: {str(model_err)}")
+            
+            flash(f'Recommended crop: {prediction_result}', 'success')
                 
         except Exception as e:
             logging.error(f"Prediction error: {str(e)}")
             flash(f'Error making prediction: {str(e)}', 'danger')
     
-    return render_template('predict.html', prediction=prediction_result, input_data=session.get('input_data', None))
+    return render_template('predict.html', prediction=prediction_result, 
+                          model_predictions=model_predictions,
+                          input_data=session.get('input_data', None))
 
 @app.route('/crops')
 def crops():

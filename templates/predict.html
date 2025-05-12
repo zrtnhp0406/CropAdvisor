@@ -95,6 +95,39 @@
                             <span>{{ prediction }}</span>
                         </div>
                         
+                        {% if model_predictions %}
+                        <div class="model-predictions mt-4">
+                            <h5>Individual Model Predictions:</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Model</th>
+                                            <th>Prediction</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for model_name, model_prediction in model_predictions.items() %}
+                                        <tr {% if model_prediction == prediction %}class="table-success"{% endif %}>
+                                            <td>{{ model_name }}</td>
+                                            <td>{{ model_prediction }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="models-chart-container mt-3 mb-3">
+                                <canvas id="modelPredictionsChart" width="400" height="200"></canvas>
+                            </div>
+                            
+                            <p class="text-muted small">
+                                <i class="fas fa-info-circle"></i> 
+                                Final recommendation is based on the most frequent prediction among all models (voting ensemble).
+                            </p>
+                        </div>
+                        {% endif %}
+                        
                         <div class="mt-4">
                             <h5>About this crop:</h5>
                             <div class="crop-info">
